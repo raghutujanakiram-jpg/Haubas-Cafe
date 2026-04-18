@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="de" data-theme="light">
 <head>
@@ -777,28 +776,93 @@
                 ]}
             ];
 
-            const catIcons = {
-                'SUPPEN': 'ri-bowl-line', 'VORSPEISEN': 'ri-restaurant-2-line',
-                'SALATE': 'ri-leaf-line', 'HAUPTGERICHTE': 'ri-restaurant-line',
-                'STEAKS': 'ri-fire-line', 'FISCH': 'ri-anchor-line',
-                'BURGER': 'ri-empathize-line', 'DESSERTS': 'ri-cake-2-line'
+            const catConfig = {
+                'SUPPEN':        { icon: 'ri-bowl-line',         img: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=900&h=220&fit=crop&q=80' },
+                'VORSPEISEN':    { icon: 'ri-restaurant-2-line', img: 'https://images.unsplash.com/photo-1626200926749-ccdf2b3b3e8e?w=900&h=220&fit=crop&q=80' },
+                'SALATE':        { icon: 'ri-leaf-line',         img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=900&h=220&fit=crop&q=80' },
+                'HAUPTGERICHTE': { icon: 'ri-restaurant-line',   img: 'https://images.unsplash.com/photo-1599921841143-819065a55cc6?w=900&h=220&fit=crop&q=80' },
+                'STEAKS':        { icon: 'ri-fire-line',         img: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=900&h=220&fit=crop&q=80' },
+                'FISCH':         { icon: 'ri-anchor-line',       img: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=900&h=220&fit=crop&q=80' },
+                'BURGER':        { icon: 'ri-empathize-line',    img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&h=220&fit=crop&q=80' },
+                'DESSERTS':      { icon: 'ri-cake-2-line',       img: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=900&h=220&fit=crop&q=80' }
             };
+
+            // Per-item thumbnail map by item name keyword
+            const itemImgs = {
+                'Kartoffelsuppe':    'https://images.unsplash.com/photo-1547592180-85f173990554?w=72&h=72&fit=crop&q=75',
+                'Maiszauber':        'https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=72&h=72&fit=crop&q=75',
+                'Tomatensuppe':      'https://images.unsplash.com/photo-1571167366136-b57e52d5ee4a?w=72&h=72&fit=crop&q=75',
+                'Gemüsetraum':       'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=72&h=72&fit=crop&q=75',
+                'Bruschetta':        'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=72&h=72&fit=crop&q=75',
+                'Sticks':            'https://images.unsplash.com/photo-1630494289618-c0aeeb3c65b2?w=72&h=72&fit=crop&q=75',
+                'Knusperflügel':     'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=72&h=72&fit=crop&q=75',
+                'Chili':             'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=72&h=72&fit=crop&q=75',
+                'Dattelbissen':      'https://images.unsplash.com/photo-1510693206972-df098062cb71?w=72&h=72&fit=crop&q=75',
+                'Tatar':             'https://images.unsplash.com/photo-1615865468824-f6e26b1af12f?w=72&h=72&fit=crop&q=75',
+                'Vorspeisenplatte':  'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=72&h=72&fit=crop&q=75',
+                'Beilagensalat':     'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=72&h=72&fit=crop&q=75',
+                'Schafskäse':        'https://images.unsplash.com/photo-1595670002930-b30c824db326?w=72&h=72&fit=crop&q=75',
+                'Käsesalat':         'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=72&h=72&fit=crop&q=75',
+                'Nordsee':           'https://images.unsplash.com/photo-1559847844-5315695dadae?w=72&h=72&fit=crop&q=75',
+                'Haubach-Salat':     'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=72&h=72&fit=crop&q=75',
+                'Scampi':            'https://images.unsplash.com/photo-1559737558-2f5a35f4523b?w=72&h=72&fit=crop&q=75',
+                'Cowboy':            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=72&h=72&fit=crop&q=75',
+                'Folienkartoffeln':  'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=72&h=72&fit=crop&q=75',
+                'Currywurst':        'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=72&h=72&fit=crop&q=75',
+                'Leberkäse':         'https://images.unsplash.com/photo-1546039907-7fa05f864c02?w=72&h=72&fit=crop&q=75',
+                'Blutwurst':         'https://images.unsplash.com/photo-1611489704987-cca0c7e22011?w=72&h=72&fit=crop&q=75',
+                'Gemüseschnitzel':   'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=72&h=72&fit=crop&q=75',
+                'Schnitzel':         'https://images.unsplash.com/photo-1599921841143-819065a55cc6?w=72&h=72&fit=crop&q=75',
+                'Hähnchen':          'https://images.unsplash.com/photo-1598515213692-b63ab4ac6b71?w=72&h=72&fit=crop&q=75',
+                'Holzfällersteak':   'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=72&h=72&fit=crop&q=75',
+                'Klopse':            'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=72&h=72&fit=crop&q=75',
+                'Kalbsleber':        'https://images.unsplash.com/photo-1611489704987-cca0c7e22011?w=72&h=72&fit=crop&q=75',
+                'Kalbsschnitzel':    'https://images.unsplash.com/photo-1599921841143-819065a55cc6?w=72&h=72&fit=crop&q=75',
+                'Rindersteak':       'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=72&h=72&fit=crop&q=75',
+                'Steak':             'https://images.unsplash.com/photo-1558030006-450675393462?w=72&h=72&fit=crop&q=75',
+                'Rotbarsch':         'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=72&h=72&fit=crop&q=75',
+                'Garten-Burger':     'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=72&h=72&fit=crop&q=75',
+                'Chicken Burger':    'https://images.unsplash.com/photo-1619881589316-0cf84f4e8d8c?w=72&h=72&fit=crop&q=75',
+                'Cheeseburger':      'https://images.unsplash.com/photo-1550317138-10000687a72b?w=72&h=72&fit=crop&q=75',
+                'Bacon-Burger':      'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=72&h=72&fit=crop&q=75',
+                'Haubach Burger':    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=72&h=72&fit=crop&q=75',
+                'Apfelstrudel':      'https://images.unsplash.com/photo-1562440499-64c9a111f713?w=72&h=72&fit=crop&q=75',
+                'Soufflé':           'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=72&h=72&fit=crop&q=75',
+                'Churros':           'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=72&h=72&fit=crop&q=75'
+            };
+
+            function getItemImg(name) {
+                for (const [key, url] of Object.entries(itemImgs)) {
+                    if (name.includes(key)) return url;
+                }
+                return null;
+            }
 
             let html = '';
             HAUBACH_MENU.forEach((section, idx) => {
-                const icon = catIcons[section.category] || 'ri-star-line';
+                const conf = catConfig[section.category] || { icon: 'ri-star-line', img: '' };
                 const delay = (idx % 2 === 0) ? '0ms' : '150ms';
                 html += `<div class="reveal" style="transition-delay:${delay};">
-                    <h3 class="brand-font text-2xl text-[var(--gold)] border-b border-[var(--border-primary)] pb-4 mb-8 flex items-center">
-                        <i class="${icon} mr-3"></i> ${section.category}
-                    </h3>`;
-                section.items.forEach(item => {
-                    html += `<div class="menu-item-row">
-                        <div>
-                            <h4 class="font-bold tracking-wide text-sm">${item.name}</h4>
-                            ${item.desc ? `<p class="text-xs text-[var(--text-secondary)] mt-1 serif-text italic">${item.desc}</p>` : ''}
+                    ${conf.img ? `<div class="relative overflow-hidden rounded-lg mb-6" style="height:160px;">
+                        <img src="${conf.img}" alt="${section.category}" loading="lazy" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-5">
+                            <h3 class="brand-font text-2xl text-white flex items-center">
+                                <i class="${conf.icon} mr-3 text-[var(--gold)]"></i> ${section.category}
+                            </h3>
                         </div>
-                        <span class="font-semibold text-[var(--gold)] ml-4 whitespace-nowrap">${item.price}</span>
+                    </div>` : `<h3 class="brand-font text-2xl text-[var(--gold)] border-b border-[var(--border-primary)] pb-4 mb-6 flex items-center">
+                        <i class="${conf.icon} mr-3"></i> ${section.category}
+                    </h3>`}`;
+
+                section.items.forEach(item => {
+                    const thumbUrl = getItemImg(item.name);
+                    html += `<div class="menu-item-row flex items-center gap-4">
+                        ${thumbUrl ? `<img src="${thumbUrl}" alt="${item.name}" loading="lazy" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 shadow-sm" onerror="this.style.display='none'">` : `<div class="w-14 h-14 rounded-lg bg-[var(--gold)]/10 flex items-center justify-center flex-shrink-0"><i class="${conf.icon} text-[var(--gold)] text-xl"></i></div>`}
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold tracking-wide text-sm">${item.name}</h4>
+                            ${item.desc ? `<p class="text-xs text-[var(--text-secondary)] mt-0.5 serif-text italic leading-relaxed">${item.desc}</p>` : ''}
+                        </div>
+                        <span class="font-semibold text-[var(--gold)] ml-2 whitespace-nowrap">${item.price}</span>
                     </div>`;
                 });
                 html += '</div>';
@@ -910,6 +974,3 @@
     </script>
 </body>
 </html>
-Clicking...Pressing key...Stopping...
-
-Stop Agent
