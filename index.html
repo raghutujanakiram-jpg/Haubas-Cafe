@@ -244,7 +244,7 @@
 
         /* Review Modal */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; w-full; h-full;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(5px);
             z-index: 100;
@@ -256,7 +256,7 @@
             padding: 2.5rem;
             border-radius: 8px;
             border: 1px solid var(--border-primary);
-            width: 90%; max-w-md;
+            width: 90%; max-width: 28rem;
             position: relative;
         }
         
@@ -268,7 +268,7 @@
     <nav class="fixed top-0 w-full z-50 frosted-nav border-b border-[var(--border-primary)] transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#/home" class="flex items-center py-1">
-                <img src="./Haubach_Cafe_Logos/Haubach_Transparent_black text_without tag.png" alt="Haubach Haus" id="nav-logo" class="h-14 md:h-20 w-auto object-contain drop-shadow-sm transition-opacity duration-300">
+                <img src="./Haubach_Cafe_Logos/Haubach_Transparent_black%20text_without%20tag.png" alt="Haubach Haus" id="nav-logo" class="h-14 md:h-20 w-auto object-contain drop-shadow-sm transition-opacity duration-300">
             </a>
             
             <!-- Desktop Menu -->
@@ -677,7 +677,7 @@
             if (logo) {
                 logo.style.opacity = 0;
                 setTimeout(() => {
-                    logo.src = isDark ? './Haubach_Cafe_Logos/Haubach_Transparent_black text_without tag.png' : './Haubach_Cafe_Logos/Haubach_Transparent_whitetext.png';
+                    logo.src = isDark ? './Haubach_Cafe_Logos/Haubach_Transparent_whitetext.png' : './Haubach_Cafe_Logos/Haubach_Transparent_black%20text_without%20tag.png';
                     logo.style.opacity = 1;
                 }, 150);
             }
@@ -811,24 +811,16 @@
             // TableAgent Widget Logic
             if (hash === '#/reservation') {
                 const container = document.getElementById('tableagent-container');
-                // A demo/placeholder or actual ID. Default fallback visually appealing.
-                const tableAgentID = "REPLACE_WITH_YOUR_ID"; 
-                
-                if (tableAgentID !== "REPLACE_WITH_YOUR_ID") {
-                    const script = document.createElement('script');
-                    script.src = `https://tableagent.com/widget/${tableAgentID}/`;
-                    script.async = true;
-                    container.innerHTML = ""; 
-                    container.appendChild(script);
-                } else {
-                    container.innerHTML = `
-                    <div class="h-full w-full flex flex-col items-center justify-center p-10 bg-[var(--bg-primary)] border-2 border-dashed border-[var(--border-primary)] rounded">
-                        <i class="ri-calendar-check-line text-6xl text-[var(--gold)] mb-4"></i>
-                        <h3 class="brand-font text-2xl mb-2">System Setup in Progress</h3>
-                        <p class="text-sm text-[var(--text-secondary)] italic">(Awaiting TableAgent ID Integration)</p>
-                        <button class="mt-6 btn-gold" onclick="alert('Demo: Table Selection opens here!')">Mock Reservation</button>
-                    </div>`;
-                }
+                // Embedded IFrame directly via TableAgent's provided snippet
+                container.innerHTML = `
+                    <iframe
+                      src="https://tableagent.com/iframe/cafe-haubach/"
+                      style="border:0px none;min-width:375px;min-height:736px;background:transparent;"
+                      sandbox="allow-forms allow-modals allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+                      width="100%"
+                      height="100%">
+                    </iframe>
+                `;
             }
 
             // Scroll to top on route change
