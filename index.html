@@ -175,7 +175,7 @@
         }
         .floating-ws:hover { transform: scale(1.1); }
 
-        .floating-chat {
+        .floating-chat hidden {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
@@ -190,7 +190,7 @@
             transition: transform 0.3s ease;
             cursor: pointer;
         }
-        .floating-chat:hover { transform: scale(1.1); }
+        .floating-chat hidden:hover { transform: scale(1.1); }
 
         .chatbot-window {
             position: fixed;
@@ -357,7 +357,7 @@
     </a>
 
     <!-- Floating Chatbot -->
-    <div class="floating-chat" onclick="toggleChat()">
+    <div class="floating-chat hidden" onclick="toggleChat()">
         <i class="ri-robot-2-line"></i>
     </div>
     <div class="chatbot-window" id="chatbot">
