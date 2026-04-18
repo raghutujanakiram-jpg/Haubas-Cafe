@@ -1,9 +1,8 @@
 {
-  "name": "haubach-haus",
-  "version": "1.0.0",
-  "description": "Haubach Haus SPA",
-  "type": "module",
-  "scripts": {
-    "start": "npx serve ."
-  }
+    "name": "haubach-haus",
+    "version": "1.0.0",
+    "description": "Haubach Haus SPA",
+    "scripts": {
+          "start": "npx serve ."
+    }
 }
