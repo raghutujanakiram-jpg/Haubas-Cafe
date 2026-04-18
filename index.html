@@ -811,15 +811,16 @@
             // TableAgent Widget Logic
             if (hash === '#/reservation') {
                 const container = document.getElementById('tableagent-container');
-                // Embedded IFrame directly via TableAgent's provided snippet
+                // TableAgent blocked iframe due to X-Frame-Options. Using their recommended Direct Link Option 2 instead.
                 container.innerHTML = `
-                    <iframe
-                      src="https://tableagent.com/iframe/cafe-haubach/"
-                      style="border:0px none;min-width:375px;min-height:736px;background:transparent;"
-                      sandbox="allow-forms allow-modals allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
-                      width="100%"
-                      height="100%">
-                    </iframe>
+                    <div class="h-full w-full flex flex-col items-center justify-center py-20 px-10 bg-[var(--bg-primary)] border-2 border-dashed border-[var(--border-primary)] rounded">
+                        <i class="ri-calendar-event-line text-6xl text-[var(--gold)] mb-6"></i>
+                        <h3 class="brand-font text-3xl mb-4 text-[var(--text-primary)]">Book Your Table</h3>
+                        <p class="text-sm font-light text-[var(--text-secondary)] mb-8 max-w-sm text-center">You will be redirected to our secure TableAgent reservation partner to select your exact date and time.</p>
+                        <a href="https://tableagent.com/berlin/cafe-haubach/table-search/" target="_blank" class="btn-gold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300">
+                            Make Reservation <i class="ri-external-link-line ml-2"></i>
+                        </a>
+                    </div>
                 `;
             }
 
