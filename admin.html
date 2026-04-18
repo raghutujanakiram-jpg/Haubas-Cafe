@@ -199,7 +199,7 @@
                         <div class="p-3 border-t border-borderPrimary bg-black shrink-0 relative">
                             <div class="relative flex items-center border border-borderPrimary bg-card rounded-full p-1 pl-4 pr-1 focus-within:border-gold transition">
                                 <input type="text" id="ai-chat-input" placeholder="e.g. Change hero subtitle..." class="w-full bg-transparent text-white outline-none text-sm py-1.5" onkeypress="handleAiChat(event)">
-                                <button onclick="alert('Voice Editing Module (Phase 2) is detecting microphone permissions... This feature will launch in the next iteration.')" class="text-gray-500 hover:text-gold p-2 transition mr-1" title="Phase 2 Voice Editor">
+                                <button id="mic-btn" onclick="toggleRecording()" class="text-gray-500 hover:text-gold p-2 transition mr-1" title="Voice Editor">
                                     <i class="ri-mic-line text-lg"></i>
                                 </button>
                                 <button onclick="sendAiChat()" class="bg-gold text-black w-8 h-8 rounded-full flex items-center justify-center hover:bg-white transition shrink-0">
@@ -321,6 +321,77 @@
         
         function handleAiChat(e) {
             if(e.key === 'Enter') sendAiChat();
+        }
+
+        // --- Voice Recognition (Phase 2) ---
+        let recognition;
+        let isRecording = false;
+        
+        function toggleRecording() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Your browser does not support Speech Recognition. Please use Chrome.');
+                return;
+            }
+
+            const micBtn = document.getElementById('mic-btn');
+            const input = document.getElementById('ai-chat-input');
+
+            if (isRecording) {
+                if(recognition) recognition.stop();
+                return;
+            }
+
+            const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechAPI();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = function() {
+                isRecording = true;
+                micBtn.classList.remove('text-gray-500');
+                micBtn.classList.add('text-red-500', 'animate-pulse');
+                input.placeholder = "Listening...";
+                input.value = "";
+            };
+
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                if (finalTranscript) {
+                    input.value = finalTranscript;
+                    setTimeout(sendAiChat, 500); // Auto-submit voice query
+                } else {
+                    input.value = interimTranscript;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Speech error", event.error);
+                resetMic(micBtn, input);
+            };
+
+            recognition.onend = function() {
+                resetMic(micBtn, input);
+            };
+
+            recognition.start();
+        }
+        
+        function resetMic(btn, input) {
+            isRecording = false;
+            btn.classList.add('text-gray-500');
+            btn.classList.remove('text-red-500', 'animate-pulse');
+            input.placeholder = "e.g. Change hero subtitle...";
         }
 
         // --- True Database Integration (Phase 2) ---
