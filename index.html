@@ -6,7 +6,7 @@
     <title>Haubach Haus | Tradition meets enjoyment</title>
     <meta name="description" content="Haubach Haus - An exclusive 40-pax sanctuary for culinary excellence in Berlin. Experience fine dining, artisan cafe culture, and curated bar spirits.">
     <!-- Favicon -->
-    <link rel="icon" id="favicon" href="./Haubach_Cafe_Logos/Haubach_Favicon_Simple.png" />
+    <link rel="icon" id="favicon" href="./Haubach_Favicon_Simple.png" />
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -677,7 +677,7 @@
             if (logo) {
                 logo.style.opacity = 0;
                 setTimeout(() => {
-                    logo.src = isDark ? './Haubach_Cafe_Logos/Haubach_Transparent_whitetext.png' : './Haubach_Cafe_Logos/Haubach_Transparent_black%20text_without%20tag.png';
+                    logo.src = isDark ? './Haubach_Transparent_whitetext.png' : './Haubach_Cafe_Logos/Haubach_Transparent_black%20text_without%20tag.png';
                     logo.style.opacity = 1;
                 }, 150);
             }
@@ -691,7 +691,7 @@
                 document.documentElement.setAttribute('data-theme', 'dark');
                 document.getElementById('theme-icon').className = 'ri-sun-line';
                 const logo = document.getElementById('nav-logo');
-                if (logo) logo.src = './Haubach_Cafe_Logos/Haubach_Transparent_whitetext.png';
+                if (logo) logo.src = './Haubach_Transparent_whitetext.png';
             }
         });
 
