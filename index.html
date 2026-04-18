@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de" data-theme="light">
 <head>
@@ -175,41 +176,13 @@
         }
         .floating-ws:hover { transform: scale(1.1); }
 
-        .floating-chat hidden {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--gold);
-            color: white;
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            z-index: 90;
-            transition: transform 0.3s ease;
-            cursor: pointer;
+        .floating-chat {
+            display: none !important;
         }
-        .floating-chat hidden:hover { transform: scale(1.1); }
 
         .chatbot-window {
-            position: fixed;
-            bottom: 80px;
-            right: 2rem;
-            width: 320px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-primary);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            z-index: 99;
-            transform: scale(0);
-            transform-origin: bottom right;
-            transition: transform 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            display: none !important;
         }
-        .chatbot-window.open { transform: scale(1); }
         .chat-header {
             background: var(--gold);
             color: white;
@@ -268,7 +241,7 @@
     <nav class="fixed top-0 w-full z-50 frosted-nav border-b border-[var(--border-primary)] transition-all duration-300" id="navbar">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#/home" class="flex items-center py-1">
-                <img src="./Haubach_Transparent_black%20text_without%20tag.png" alt="Haubach Haus" id="nav-logo" class="h-14 md:h-20 w-auto object-contain drop-shadow-sm transition-opacity duration-300">
+                <img src="./Haubach_Transparent_black text_without tag.png" alt="Haubach Haus" id="nav-logo" class="h-14 md:h-20 w-auto object-contain drop-shadow-sm transition-opacity duration-300">
             </a>
             
             <!-- Desktop Menu -->
@@ -357,7 +330,7 @@
     </a>
 
     <!-- Floating Chatbot -->
-    <div class="floating-chat hidden" onclick="toggleChat()">
+    <div class="floating-chat" onclick="toggleChat()">
         <i class="ri-robot-2-line"></i>
     </div>
     <div class="chatbot-window" id="chatbot">
@@ -677,7 +650,7 @@
             if (logo) {
                 logo.style.opacity = 0;
                 setTimeout(() => {
-                    logo.src = isDark ? './Haubach_Transparent_whitetext.png' : './Haubach_Transparent_black%20text_without%20tag.png';
+                    logo.src = isDark ? './Haubach_Transparent_whitetext.png' : './Haubach_Transparent_black text_without tag.png';
                     logo.style.opacity = 1;
                 }, 150);
             }
@@ -717,77 +690,121 @@
         };
 
         async function fetchLiveMenu() {
-            if (DB_CONFIG.useCloud) {
-                try {
-                    const res = await fetch(DB_CONFIG.apiUrl, {
-                        headers: { 'Authorization': `Bearer ${DB_CONFIG.apiKey}`, 'apikey': DB_CONFIG.apiKey }
-                    });
-                    return await res.json();
-                } catch(e) { console.error("Cloud DB Auth Error:", e); return null; }
+            try {
+                const res = await fetch(DB_CONFIG.apiUrl, {
+                    headers: { 
+                        'Authorization': `Bearer ${DB_CONFIG.apiKey}`, 
+                        'apikey': DB_CONFIG.apiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                if (!res.ok) throw new Error('Supabase error: ' + res.status);
+                const data = await res.json();
+                if (Array.isArray(data) && data.length > 0) return data;
+                return null;
+            } catch(e) { 
+                console.warn('Live menu fetch failed, using fallback:', e.message); 
+                return null; 
             }
-            return JSON.parse(localStorage.getItem('haubach_menu'));
         }
 
         async function renderDynamicMenu() {
             const container = document.getElementById('dynamic-menu-container');
             if(!container) return;
-            
-            container.innerHTML = '<div class="col-span-1 md:col-span-2 text-center text-[var(--gold)] py-10"><i class="ri-loader-4-line text-4xl animate-spin inline-block"></i><p class="mt-2 text-sm uppercase tracking-widest font-bold">Connecting to Kitchen...</p></div>';
 
-            const defaultMenu = [
-                { category: 'Starters', name: 'Hausgemachte Flädlesuppe', desc: 'Clear beef broth, savory crepe strips', price: '7.50' },
-                { category: 'Starters', name: 'Rindercarpaccio', desc: 'Truffle oil, parmesan shavings, arugula', price: '14.50' },
-                { category: 'Starters', name: 'Obazda mit Brezel', desc: 'Bavarian cheese spread, fresh pretzel', price: '9.50' },
-                { category: 'Main Courses', name: 'Original Wiener Kalbsschnitzel', desc: 'Veal schnitzel, warm potato salad', price: '25.90' },
-                { category: 'Main Courses', name: 'Zürcher Geschnetzeltes', desc: 'Sliced veal in mushroom cream sauce, rösti', price: '22.50' },
-                { category: 'Main Courses', name: 'Premium Rumpsteak (250g)', desc: 'Herb butter, roasted vegetables', price: '28.50' },
-                { category: 'Burgers', name: 'Haubach Classic Burger', desc: 'Black Angus beef, aged cheddar, signature sauce', price: '16.90' },
-                { category: 'Burgers', name: 'Luxus Trüffel Burger', desc: 'Beef patty, truffle mayo, caramelized onions', price: '19.50' },
-                { category: 'Kids Menu', name: 'Kleines Schnitzel "Zauberlehrling"', desc: 'Small pork schnitzel with french fries', price: '9.50' },
-                { category: 'Kids Menu', name: 'Spätzle der Elfen', desc: 'Swabian noodles with rich gravy', price: '6.50' }
+            const HAUBACH_MENU = [
+                { category: 'SUPPEN', items: [
+                    { name: 'Berliner Kartoffelsuppe', desc: 'Herzhaft-cremige Kartoffelsuppe nach traditioneller Berliner Art', price: '5,90 €' },
+                    { name: 'Maiszauber', desc: 'Cremige, leicht süße Maissuppe aus sonnengereiftem Mais', price: '5,90 €' },
+                    { name: 'Klassische Tomatensuppe', desc: 'Cremige Tomatensuppe, verfeinert mit zarten Hähnchenstücken', price: '5,90 €' },
+                    { name: 'Gemüsetraum', desc: 'Fein abgestimmte Komposition aus frischem Marktgemüse', price: '5,90 €' }
+                ]},
+                { category: 'VORSPEISEN', items: [
+                    { name: 'Bruschetta', desc: 'Knusprige Brotscheiben, belegt mit frischen Tomaten', price: '6,90 €' },
+                    { name: 'Käseglück-Sticks', desc: 'Sechs knusprige Mozzarellasticks mit Pommes frites', price: '9,90 €' },
+                    { name: 'Knusperflügel', desc: 'Sechs goldbraun gebratene Hähnchenflügel mit Pommes frites', price: '9,90 €' },
+                    { name: 'Feuriges Chili-Hähnchen', desc: 'Pikant gebratene Hähnchenstücke mit Chili und Salat', price: '9,90 €' },
+                    { name: 'Herzhafte Dattelbissen', desc: 'Sechs saftige Datteln im Speckmantel, fein gebraten', price: '10,90 €' },
+                    { name: 'Rind in Perfektion', desc: 'Klassisches Tatar, fein abgestimmt', price: '11,90 €' },
+                    { name: 'Haubach Vorspeisenplatte', desc: 'Abwechslungsreiche Auswahl unserer Vorspeisen — für 2 Personen', price: '16,90 €' }
+                ]},
+                { category: 'SALATE', items: [
+                    { name: 'Beilagensalat', desc: 'Frischer gemischter Beilagensalat', price: '4,90 €' },
+                    { name: 'Schafskäsesalat', desc: 'Gemischter Salatteller mit gebackenem Schafskäse', price: '11,90 €' },
+                    { name: 'Käsesalat', desc: 'Gemischter Salatteller mit frischem Käse', price: '12,90 €' },
+                    { name: 'Nordsee-Salat', desc: 'Gemischter Salatteller mit zartem Fisch', price: '13,90 €' },
+                    { name: 'Haubach-Salat', desc: 'Gemischter Salatteller mit gegrillter Hähnchenbrust', price: '14,90 €' },
+                    { name: 'Scampi Genuss', desc: 'Gemischter Salatteller mit sieben gegrillten Scampi', price: '15,90 €' },
+                    { name: 'Cowboy-Salat', desc: 'Gemischter Salatteller mit gegrilltem Rindersteak', price: '16,90 €' }
+                ]},
+                { category: 'HAUPTGERICHTE', items: [
+                    { name: 'Folienkartoffeln', desc: 'Mit Salatbouquet und Kräuterquark', price: '11,90 €' },
+                    { name: 'Zwei Berliner Currywürste', desc: 'Ohne Darm, mit scharfen Zwiebeln und Pommes frites', price: '13,20 €' },
+                    { name: 'Fränkischer Leberkäse', desc: 'Fleischkäse mit Spiegelei und Kartoffelsalat', price: '13,90 €' },
+                    { name: 'Gebratene Blutwurst', desc: 'Mit Kartoffelstampf, Röstzwiebeln und Apfelmus', price: '14,90 €' },
+                    { name: 'Gemüseschnitzel', desc: 'Mit Tzatziki, Pommes frites und Salatbeilage', price: '14,90 €' },
+                    { name: 'Schnitzel Rahmpaprika', desc: 'Schweineschnitzel mit Paprikarahmsauce und Salzkartoffeln', price: '17,50 €' },
+                    { name: 'Schnitzel Pfeffersauce', desc: 'Schweineschnitzel mit grüner Pfeffersauce und Kartoffelstampf', price: '17,50 €' },
+                    { name: 'Champignon-Rahm-Hähnchen', desc: 'Gegrilltes Hähnchenfilet mit Champignonrahmsauce', price: '17,90 €' },
+                    { name: 'Schnitzel mit Pommes frites', desc: 'Schweineschnitzel mit Pommes und Zitronenecke', price: '17,90 €' },
+                    { name: 'Mächtiges Holzfällersteak', desc: 'Mit reichlich Röstzwiebeln und Bratkartoffeln', price: '17,90 €' },
+                    { name: 'Königsberger Klopse', desc: 'Aus Kalb und Rind, mit Kapernsauce und Kartoffelstampf', price: '18,90 €' },
+                    { name: 'Schnitzel Steinpilzrahm', desc: 'Schweineschnitzel mit Steinpilzsauce und Rösti', price: '18,90 €' },
+                    { name: 'Schnitzel Champignon', desc: 'Schweineschnitzel mit Champignonrahmsauce und Kroketten', price: '18,90 €' },
+                    { name: 'Schnitzel Braumeister', desc: 'Mit Röstzwiebeln, Spiegelei und Bratkartoffeln', price: '19,50 €' },
+                    { name: 'Kalbsleber Berliner Art', desc: 'Mit Kartoffelstampf, Röstzwiebeln und Apfelringen', price: '19,90 €' },
+                    { name: 'Kalbsschnitzel', desc: 'Original Wiener Schnitzel mit Kartoffelsalat und Preiselbeeren', price: '25,90 €' }
+                ]},
+                { category: 'STEAKS', items: [
+                    { name: 'Rindersteak Classic', desc: 'Saftiges Rindersteak vom Grill, dazu Pommes frites oder Wedges', price: '20,90 €' },
+                    { name: 'Steak des Hauses', desc: 'Saftiges Rindersteak mit Pfeffersauce und Salatbeilage', price: '21,90 €' },
+                    { name: 'Steak Waldpilz Art', desc: 'Saftiges Rindersteak mit Champignonrahmsauce und Salatbeilage', price: '22,90 €' }
+                ]},
+                { category: 'FISCH', items: [
+                    { name: 'Rotbarschfilet (paniert)', desc: 'Mit Kartoffel-Gurkensalat und Salatbouquet', price: '17,90 €' }
+                ]},
+                { category: 'BURGER', items: [
+                    { name: 'Garten-Burger', desc: 'Veggie-Patty, mit Pommes oder Wedges', price: '15,50 €' },
+                    { name: 'Knusper Chicken Burger', desc: 'Knuspriges Hähnchenfilet, mit Pommes oder Wedges', price: '15,50 €' },
+                    { name: 'Cheeseburger', desc: 'Rindfleisch-Patty und Käse, mit Pommes oder Wedges', price: '16,50 €' },
+                    { name: 'Bacon-Burger', desc: 'Rindfleisch-Patty und Bacon, mit Pommes oder Wedges', price: '17,50 €' },
+                    { name: 'Haubach Burger', desc: 'Rindfleisch-Patty, Bacon und Spiegelei, mit Pommes oder Wedges', price: '18,50 €' }
+                ]},
+                { category: 'DESSERTS', items: [
+                    { name: 'Apfelstrudel', desc: 'Warmer Apfelstrudel mit Schokoladensauce, Vanilleeis und Sahne', price: '7,90 €' },
+                    { name: 'Schokoladensoufflé', desc: 'Warmes Soufflé mit flüssigem Kern, Vanilleeis und Sahne', price: '7,90 €' },
+                    { name: 'Churros', desc: 'Frisch frittierte Churros mit Zucker und Schokosoße', price: '7,90 €' }
+                ]}
             ];
 
-            let items = await fetchLiveMenu();
-            if (!items || items.length === 0) items = defaultMenu;
-
-            const grouped = {};
-            items.forEach(item => {
-                // Keep pending deletes hidden from the live website immediately!
-                if (item.status === 'pending_delete' || item.status === 'hold') return;
-                
-                if (!grouped[item.category]) grouped[item.category] = [];
-                grouped[item.category].push(item);
-            });
-
-            const catConfig = {
-                'Starters': { icon: 'ri-bowl-line', transKey: 'menu_starters', delay: '0ms' },
-                'Main Courses': { icon: 'ri-restaurant-line', transKey: 'menu_mains', delay: '200ms' },
-                'Burgers': { icon: 'ri-empathize-line', transKey: 'menu_burgers', delay: '0ms' },
-                'Kids Menu': { icon: 'ri-magic-line', transKey: 'menu_kids', delay: '200ms' }
+            const catIcons = {
+                'SUPPEN': 'ri-bowl-line', 'VORSPEISEN': 'ri-restaurant-2-line',
+                'SALATE': 'ri-leaf-line', 'HAUPTGERICHTE': 'ri-restaurant-line',
+                'STEAKS': 'ri-fire-line', 'FISCH': 'ri-anchor-line',
+                'BURGER': 'ri-empathize-line', 'DESSERTS': 'ri-cake-2-line'
             };
 
             let html = '';
-            for (const [cat, catItems] of Object.entries(grouped)) {
-                if(catItems.length === 0) continue;
-                const conf = catConfig[cat] || { icon: 'ri-star-line', transKey: cat.toLowerCase().replace(/ /g, '_'), delay: '0ms' };
-
-                html += `<div class="reveal" style="transition-delay: ${conf.delay};">
+            HAUBACH_MENU.forEach((section, idx) => {
+                const icon = catIcons[section.category] || 'ri-star-line';
+                const delay = (idx % 2 === 0) ? '0ms' : '150ms';
+                html += `<div class="reveal" style="transition-delay:${delay};">
                     <h3 class="brand-font text-2xl text-[var(--gold)] border-b border-[var(--border-primary)] pb-4 mb-8 flex items-center">
-                        <i class="${conf.icon} mr-3"></i> <span data-i18n="${conf.transKey}">${cat}</span>
+                        <i class="${icon} mr-3"></i> ${section.category}
                     </h3>`;
-
-                catItems.forEach(i => {
+                section.items.forEach(item => {
                     html += `<div class="menu-item-row">
                         <div>
-                            <h4 class="font-bold tracking-wide text-sm">${i.name}</h4>
-                            <p class="text-xs text-[var(--text-secondary)] mt-1 serif-text italic">${i.desc}</p>
+                            <h4 class="font-bold tracking-wide text-sm">${item.name}</h4>
+                            ${item.desc ? `<p class="text-xs text-[var(--text-secondary)] mt-1 serif-text italic">${item.desc}</p>` : ''}
                         </div>
-                        <span class="font-semibold text-[var(--gold)] ml-4">${parseFloat(i.price).toLocaleString('de-DE', {minimumFractionDigits:2, maximumFractionDigits:2})} €</span>
+                        <span class="font-semibold text-[var(--gold)] ml-4 whitespace-nowrap">${item.price}</span>
                     </div>`;
                 });
-                html += `</div>`;
-            }
+                html += '</div>';
+            });
             container.innerHTML = html;
+            initScrollReveal();
         }
 
         function router() {
@@ -893,3 +910,6 @@
     </script>
 </body>
 </html>
+Clicking...Pressing key...Stopping...
+
+Stop Agent
